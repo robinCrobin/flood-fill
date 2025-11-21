@@ -5,7 +5,9 @@ Este projeto implementa o **Algoritmo Flood Fill** (Preenchimento por Inundaçã
 O objetivo é identificar e preencher automaticamente todas as regiões livres e conectadas em um grid 2D, separando-as com cores distintas. Os obstáculos (barreiras) funcionam como limites que impedem a expansão do preenchimento, garantindo que as regiões desconectadas sejam isoladas e mapeadas individualmente.
 
 ## Introdução sobre o problema Flood Fill
+O problema abordado consiste em interpretar um grid bidimensional n x m, onde células com valor (0) representam terreno navegável e células com valor (1) representam obstáculos.
 
+O desafio principal é que o terreno pode conter múltiplas áreas navegáveis isoladas umas das outras por paredes de obstáculos. O robô precisa não apenas mapear uma área, mas também identificar todas as regiões livres desconectadas do mapa, atribuindo um identificador único (uma "cor" numérica: 2, 3, 4...) para cada região distinta. Além disso, ele deve evitar os obstáculos no terreno e não ultrapassá-los, mantendo-os com o valor (1).
 
 ## Instruções para executar o projeto
 ### Pré-requisitos:
