@@ -29,11 +29,14 @@ def flood_fill_recursive(grid, x, y, new_color):
         flood_fill_recursive(grid, new_x, new_y, new_color)
 
 
-def color_all_regions(grid, start_x, start_y):
+def color_all_regions(grid, start_x, start_y, current_color):
     """
     Função que gerencia as cores e analisa o terreno.
     """
-    current_color = 2 
+    if current_color < 1:
+        current_color = 1
+        
+    current_color+=1 
     
     print(f"Iniciando pintura na coordenada ({start_x}, {start_y}) com a cor {current_color}...")
 
