@@ -1,115 +1,142 @@
 import sys
-sys.setrecursionlimit(2000) 
+from collections import deque
+
+sys.setrecursionlimit(10**6)
 
 def is_valid(grid, x, y):
-    """
-    Verifica se a célula (x, y) está dentro dos limites do grid.
-    """
-    N = len(grid)
-    M = len(grid[0])
-    return 0 <= x < N and 0 <= y < M
+    """Verifica se (x,y) está dentro do grid."""
+    return 0 <= x < len(grid) and 0 <= y < len(grid[0])
 
-def flood_fill_recursive(grid, x, y, new_color):
+def flood_fill_iterative(grid, x, y, new_color):
     """
-    Implementa o algoritmo Flood Fill recursivamente, 
-    preenchendo uma única região navegável (valor 0).
+    Flood Fill iterativo (BFS).
+    Preenche apenas células com valor 0.
     """
-    if not is_valid(grid, x, y):
+    if not is_valid(grid, x, y) or grid[x][y] != 0:
         return
-    
-    if grid[x][y] != 0:
-        return
-    
+
+    q = deque()
+    q.append((x, y))
     grid[x][y] = new_color
-    
-    directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
-    
-    for dx, dy in directions:
-        new_x, new_y = x + dx, y + dy
-        flood_fill_recursive(grid, new_x, new_y, new_color)
 
+    directions = [(0,1), (0,-1), (1,0), (-1,0)]
 
-def color_all_regions(grid, start_x, start_y, current_color):
-    """
-    Função que gerencia as cores e analisa o terreno.
-    """
-    if current_color < 1:
-        current_color = 1
-        
-    current_color+=1 
-    
-    print(f"Iniciando pintura na coordenada ({start_x}, {start_y}) com a cor {current_color}...")
+    while q:
+        cx, cy = q.popleft()
+        for dx, dy in directions:
+            nx, ny = cx + dx, cy + dy
+            if is_valid(grid, nx, ny) and grid[nx][ny] == 0:
+                grid[nx][ny] = new_color
+                q.append((nx, ny))
 
-    if is_valid(grid, start_x, start_y) and grid[start_x][start_y] == 0:
-        flood_fill_recursive(grid, start_x, start_y, current_color)
-        current_color += 1 
-    else:
-        print("A coordenada inicial não é válida ou é um obstáculo.")
-
+def find_next_zero(grid):
+    """Retorna a próxima célula (i,j) com valor 0, ou None se não houver."""
     for i in range(len(grid)):
         for j in range(len(grid[0])):
-            if grid[i][j] == 0: 
-                flood_fill_recursive(grid, i, j, current_color)
-                current_color += 1 
-    
+            if grid[i][j] == 0:
+                return i, j
+    return None
+
+def color_all_regions(grid, start_x, start_y, first_color=2):
+    """
+    Pinta todas as regiões 0 desconectadas:
+    - Começa pela coordenada inicial se for navegável (0).
+    - Caso contrário, procura a primeira célula 0 no grid.
+    - Usa cores: 2,3,4,... (incrementando por região).
+    - Mantém obstáculos (1) e regiões já coloridas (>1).
+    """
+    if not grid or not grid[0]:
+        return grid
+
+    color = first_color
+
+    if is_valid(grid, start_x, start_y) and grid[start_x][start_y] == 0:
+        flood_fill_iterative(grid, start_x, start_y, color)
+        color += 1
+
+    while True:
+        nxt = find_next_zero(grid)
+        if nxt is None:
+            break
+        x, y = nxt
+        flood_fill_iterative(grid, x, y, color)
+        color += 1
+
     return grid
 
+def flood_fill_steps(grid, x, y, new_color):
+    """
+    Flood Fill iterativo que emite passos:
+    yield (cx, cy, new_color) a cada célula colorida.
+    """
+    if not is_valid(grid, x, y) or grid[x][y] != 0:
+        return
 
-def main():
-    # Entrada 1: Dimensões do grid N x M
-    print("\nDigite as dimensões do grid (N M):")
-    N, M = map(int, input().split())
-    
-    # Entrada 2: O grid em si
-    print(f"\nDigite o grid {N}x{M}:")
-    print("  0 = Terreno navegável (branco)")
-    print("  1 = Obstáculo (preto)")
-    print("  2, 3, 4... = Cores já preenchidas")
-    print("\nInsira cada linha com valores separados por espaço:")
-    
-    grid = []
-    for i in range(N):
-        print(f"Linha {i + 1}: ", end="")
-        linha = list(map(int, input().split()))
-        
-        if len(linha) != M:
-            print(f"ERRO: A linha deve ter {M} valores!")
-            return
-        
-        grid.append(linha)
-    
-    print(f"\nDigite as coordenadas iniciais (x y):")
-    print(f"Onde x está entre 0 e {N-1}, e y está entre 0 e {M-1}")
-    x, y = map(int, input().split())
-    
-    if not is_valid(grid, x, y):
-        print(f"ERRO: Coordenadas ({x}, {y}) estão fora dos limites do grid!")
+    q = deque()
+    q.append((x, y))
+    grid[x][y] = new_color
+    yield (x, y, new_color)
+
+    directions = [(0,1), (0,-1), (1,0), (-1,0)]
+
+    while q:
+        cx, cy = q.popleft()
+        for dx, dy in directions:
+            nx, ny = cx + dx, cy + dy
+            if is_valid(grid, nx, ny) and grid[nx][ny] == 0:
+                grid[nx][ny] = new_color
+                yield (nx, ny, new_color)
+                q.append((nx, ny))
+
+def color_all_regions_steps(grid, start_x, start_y, first_color=2):
+    """
+    Versão do color_all_regions que gera passos:
+    yield (x, y, color) conforme colore cada célula.
+    """
+    if not grid or not grid[0]:
         return
-    
-    if grid[x][y] != 0:
-        print(f"ERRO: A célula inicial ({x}, {y}) não é navegável (valor = {grid[x][y]})!")
-        print("A célula inicial deve ter valor 0 (terreno navegável).")
-        return
-    
-    print("\nGRID ORIGINAL:")
-    print_grid(grid)
-    
-    print("\nPROCESSAMENTO DO FLOOD FILL:")
-    color_all_regions(grid, x, y)
-    
-    print("\nGRID APÓS PREENCHIMENTO:")
-    print_grid(grid)
+
+    color = first_color
+
+    if is_valid(grid, start_x, start_y) and grid[start_x][start_y] == 0:
+        for step in flood_fill_steps(grid, start_x, start_y, color):
+            yield step
+        color += 1
+
+    while True:
+        nxt = find_next_zero(grid)
+        if nxt is None:
+            break
+        x, y = nxt
+        for step in flood_fill_steps(grid, x, y, color):
+            yield step
+        color += 1
+
+ANSI_COLORS = {
+    0: "\033[97m",   # branco
+    1: "\033[90m",   # cinza (obstáculo)
+    2: "\033[91m",   # vermelho
+    3: "\033[93m",   # amarelo/laranja
+    4: "\033[92m",   # verde
+    5: "\033[94m",   # azul
+    6: "\033[95m",   # magenta
+    7: "\033[96m",   # ciano
+}
+ANSI_RESET = "\033[0m"
 
 def print_grid(grid):
     """
-    Exibe o grid de forma formatada e visual.
+    Exibe o grid no terminal com formatação visual completa:
+    - Índices de linhas e colunas
+    - Cores ANSI para melhor visualização
+    - Símbolos especiais para terrenos e obstáculos
     """
     if not grid:
         print("Grid vazio!")
         return
     
     N = len(grid)
-    M = len(grid[0])
+    M = len(grid[0]) if grid else 0
     
     print("\n    ", end="")
     for j in range(M):
@@ -121,14 +148,20 @@ def print_grid(grid):
         print(f"{i:2} |", end=" ")
         for j in range(M):
             valor = grid[i][j]
+            cor = ANSI_COLORS.get(valor, "\033[37m")
+            
+            # Usa símbolos especiais para valores 0 e 1, números para cores
             if valor == 0:
-                print(f"  .", end=" ") 
+                simbolo = "  ."  # Terreno navegável
             elif valor == 1:
-                print(f"  #", end=" ")  
+                simbolo = "  #"  # Obstáculo
             else:
-                print(f"{valor:3}", end=" ")  
+                simbolo = f"{valor:3}"  # Cores preenchidas (2, 3, 4, ...)
+            
+            # Aplica cor ANSI ao símbolo/número
+            print(f"{cor}{simbolo}{ANSI_RESET}", end=" ")
         print()
     print()
 
-if __name__ == "__main__":
-    main()
+# Este módulo contém as funções principais do algoritmo Flood Fill.
+# Para executar o programa, use: python3 main.py
