@@ -16,25 +16,62 @@ O desafio principal é que o terreno pode conter múltiplas áreas navegáveis i
 
 ### Pré-requisitos
 
-Ter Python 3 instalado.
+- Python 3.x
+- tkinter (geralmente incluído com Python, necessário apenas para visualização gráfica)
 
 ### Execução
 
-1. Clone este repositório.
-2. Abra o terminal na pasta do projeto.
-3. Execute:
-
-- Windows:
-  
+**Clone este repositório:**
 ```bash
-python main.py
+git clone <url-do-repositorio>
+cd flood-fill
 ```
 
-* macOS / Linux:
+**Escolha o modo de execução:**
 
+#### 1️⃣ Modo Interativo (Recomendado para iniciantes)
 ```bash
 python3 main.py
 ```
+O programa irá:
+- Solicitar as dimensões do grid
+- Solicitar cada linha do grid
+- Solicitar as coordenadas iniciais
+- Validar todas as entradas
+- Exibir resultados no terminal (com cores)
+- Perguntar se deseja ver animação gráfica
+
+#### 2️⃣ Modo Grid Aleatório
+```bash
+# Grid aleatório 10×10
+python3 main.py --random 10 10
+
+# Grid aleatório com animação
+python3 main.py --random 10 10 --gui
+
+# Grid aleatório com menos obstáculos (20% ao invés de 30%)
+python3 main.py --random 15 15 --p 0.2
+
+# Grid reproduzível (com seed)
+python3 main.py --random 8 8 --seed 42
+```
+
+#### 3️⃣ Modo Arquivo de Entrada
+```bash
+python3 main.py < entrada.txt
+```
+
+**Formato do arquivo:**
+```
+N M
+linha1 (M valores)
+linha2
+...
+linhaN
+x y
+```
+
+### Exemplos de Entrada
 
 O programa exibirá o **grid inicial** e o **grid final preenchido** no terminal.
 

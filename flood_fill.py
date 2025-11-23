@@ -124,16 +124,44 @@ ANSI_COLORS = {
 }
 ANSI_RESET = "\033[0m"
 
-def print_grid(grid, colored=False):
-    """Imprime o grid no terminal."""
-    if not colored:
-        for row in grid:
-            print(" ".join(map(str, row)))
+def print_grid(grid):
+    """
+    Exibe o grid no terminal com formatação visual completa:
+    - Índices de linhas e colunas
+    - Cores ANSI para melhor visualização
+    - Símbolos especiais para terrenos e obstáculos
+    """
+    if not grid:
+        print("Grid vazio!")
         return
+    
+    N = len(grid)
+    M = len(grid[0]) if grid else 0
+    
+    print("\n    ", end="")
+    for j in range(M):
+        print(f"{j:3}", end=" ")
+    print()
+    print("   " + "-" * (M * 4 + 1))
+    
+    for i in range(N):
+        print(f"{i:2} |", end=" ")
+        for j in range(M):
+            valor = grid[i][j]
+            cor = ANSI_COLORS.get(valor, "\033[37m")
+            
+            # Usa símbolos especiais para valores 0 e 1, números para cores
+            if valor == 0:
+                simbolo = "  ."  # Terreno navegável
+            elif valor == 1:
+                simbolo = "  #"  # Obstáculo
+            else:
+                simbolo = f"{valor:3}"  # Cores preenchidas (2, 3, 4, ...)
+            
+            # Aplica cor ANSI ao símbolo/número
+            print(f"{cor}{simbolo}{ANSI_RESET}", end=" ")
+        print()
+    print()
 
-    for row in grid:
-        line = []
-        for v in row:
-            c = ANSI_COLORS.get(v, "\033[37m")
-            line.append(f"{c}{v}{ANSI_RESET}")
-        print(" ".join(line))
+# Este módulo contém as funções principais do algoritmo Flood Fill.
+# Para executar o programa, use: python3 main.py
