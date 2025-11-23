@@ -9,9 +9,7 @@ def read_input_interactive():
     """
     Lê entrada interativa do usuário com validação.
     """
-    print("\n" + "=" * 60)
-    print("FLOOD FILL - ALGORITMO DE PREENCHIMENTO DE REGIÕES")
-    print("=" * 60)
+    print("\nFLOOD FILL - ALGORITMO DE PREENCHIMENTO DE REGIÕES")
     
     print("\nDigite as dimensões do grid (N M):")
     N, M = map(int, input().split())
@@ -143,7 +141,7 @@ def main():
         if args.start == "manual" and args.x is not None and args.y is not None:
             x, y = args.x, args.y
             if not is_valid(grid, x, y) or grid[x][y] != 0:
-                print(f"\n⚠️  Coordenada manual ({x},{y}) inválida ou não navegável.")
+                print(f"\nCoordenada manual ({x},{y}) inválida ou não navegável.")
                 print("   Usando coordenada automática...")
                 x, y = pick_random_start(grid)
         else:
@@ -168,21 +166,15 @@ def main():
     initial_grid = deepcopy(grid)
 
     # Exibir grid original
-    print("\n" + "=" * 60)
-    print("GRID ORIGINAL:")
-    print("=" * 60)
+    print("\nGRID ORIGINAL:")
     print_grid(grid)
 
     # Processar flood fill
-    print("\n" + "=" * 60)
-    print("PROCESSAMENTO DO FLOOD FILL:")
-    print("=" * 60)
+    print("\nPROCESSAMENTO DO FLOOD FILL:")
     final_grid = color_all_regions(grid, x, y)
 
     # Exibir grid final
-    print("\n" + "=" * 60)
-    print("GRID APÓS PREENCHIMENTO:")
-    print("=" * 60)
+    print("\nGRID APÓS PREENCHIMENTO:")
     print_grid(final_grid)
 
     # Animação GUI
@@ -196,8 +188,7 @@ def main():
     else:
         # Perguntar se deseja ver animação
         if sys.stdin.isatty():  # Só pergunta se terminal é interativo
-            print("\n" + "=" * 60)
-            print("🎬 Deseja ver a animação do preenchimento? (s/n): ", end="")
+            print("\nDeseja ver a animação do preenchimento? (s/n): ", end="")
             resposta = input().strip().lower()
             
             if resposta in ['s', 'sim', 'y', 'yes']:
